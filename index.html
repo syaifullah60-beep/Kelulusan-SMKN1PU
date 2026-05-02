@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Pengumuman Kelulusan SMK NEGERI 1 PENUKAL UTARA</title>
+<style>
+body {font-family: Arial; text-align:center; background:#f4f6f9;}
+.container {background:white; padding:20px; margin:50px auto; width:350px; border-radius:10px;}
+input, button {padding:10px; width:100%; margin-top:10px;}
+button {background:#3498db; color:white; border:none;}
+</style>
+</head>
+
+<body>
+
+<h2>PENGUMUMAN KELULUSAN</h2>
+<p>SMK NEGERI 1 PENUKAL UTARA</p>
+
+<div class="container">
+<input type="text" id="nisn" placeholder="Masukkan NISN">
+<button onclick="cek()">Cek Kelulusan</button>
+<div id="hasil"></div>
+</div>
+
+<script>
+const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQDmAoKhw0drIf16ZANBjoaKrn9wvMne1woW30r8ff7v4_uT1vtI0iCHNYeLK0jFKC4khbp_pR072I5/pub?output=csv";
+
+async function cek() {
+  const nisn = document.getElementById("nisn").value;
+  const res = await fetch(sheetURL);
+  const data = await res.text();
+
+  const rows = data.split("\\n").slice(1);
+
+  for (let row of rows) {
+    const [NISN, Nama, Status, SKL] = row.split(",");
+
+    if (NISN === nisn) {
+      document.getElementById("hasil").innerHTML = `
+        Nama: ${Nama}<br>
+        Status: ${Status}<br><br>
+        <a href="${SKL}" target="_blank">
+          <button>Download SKL</button>
+        </a>
+      `;
+      return;
+    }
+  }
+
+  document.getElementById("hasil").innerHTML = "NISN tidak ditemukan";
+}
+</script>
+
+</body>
+</html>
