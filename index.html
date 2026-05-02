@@ -23,23 +23,24 @@ button {background:#3498db; color:white; border:none;}
 </div>
 
 <script>
-const sheetURL = https://docs.google.com/spreadsheets/d/e/2PACX-1vQDmAoKhw0drIf16ZANBjoaKrn9wvMne1woW30r8ff7v4_uT1vtI0iCHNYeLK0jFKC4khbp_pR072I5/pub?output=csv;
+const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQDmAoKhw0drIf16ZANBjoaKrn9wvMne1woW30r8ff7v4_uT1vtI0iCHNYeLK0jFKC4khbp_pR072I5/pub?output=csv";
 
 async function cek() {
-  const nisn = document.getElementById("nisn").value;
+  const inputNama = document.getElementById("nama").value.toLowerCase().trim();
   const res = await fetch(sheetURL);
   const data = await res.text();
 
-  const rows = data.split("\\n").slice(1);
+  const rows = data.split("\n").slice(1);
 
   for (let row of rows) {
-    const [NISN, Nama, Status, SKL] = row.split(",");
+    const cols = row.split(",");
+    const nama = cols[1]?.toLowerCase().trim();
 
-    if (NISN === nisn) {
+    if (nama === inputNama) {
       document.getElementById("hasil").innerHTML = `
-        Nama: ${Nama}<br>
-        Status: ${Status}<br><br>
-        <a href="${SKL}" target="_blank">
+        Nama: ${cols[1]}<br>
+        Status: ${cols[2]}<br><br>
+        <a href="${cols[3]}" target="_blank">
           <button>Download SKL</button>
         </a>
       `;
@@ -47,9 +48,10 @@ async function cek() {
     }
   }
 
-  document.getElementById("hasil").innerHTML = "NISN tidak ditemukan";
+  document.getElementById("hasil").innerHTML = "Nama tidak ditemukan";
 }
 </script>
 
 </body>
 </html>
+
