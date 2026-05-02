@@ -1,28 +1,3 @@
-<!DOCTYPE html>
-
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<title>Pengumuman Kelulusan SMK NEGERI 1 PENUKAL UTARA</title>
-<style>
-body {font-family: Arial; text-align:center; background:#f4f6f9;}
-.container {background:white; padding:20px; margin:50px auto; width:350px; border-radius:10px;}
-input, button {padding:10px; width:100%; margin-top:10px;}
-button {background:#3498db; color:white; border:none;}
-</style>
-</head>
-
-<body>
-
-<h2>PENGUMUMAN KELULUSAN</h2>
-<p>SMK NEGERI 1 PENUKAL UTARA</p>
-
-<div class="container">
-<input type="text" id="nama" placeholder="Masukkan Nama Lengkap">
-<button onclick="cek()">Cek Kelulusan</button>
-<div id="hasil"></div>
-</div>
-
 <script>
 const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQDmAoKhw0drIf16ZANBjoaKrn9wvMne1woW30r8ff7v4_uT1vtI0iCHNYeLK0jFKC4khbp_pR072I5/pub?output=csv";
 
@@ -31,13 +6,14 @@ async function cek() {
   const res = await fetch(sheetURL);
   const data = await res.text();
 
-  const rows = data.split("\\n").slice(1);
+  const rows = data.split("\n").slice(1);
 
   for (let row of rows) {
-    const cols = row.split(",");
+    const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+
     const nama = cols[1]?.toLowerCase().trim();
 
-    if (nama === inputNama) {
+    if (nama.includes(inputNama)) {
       document.getElementById("hasil").innerHTML = `
         <h3>${cols[1]}</h3>
         Status: <b>${cols[2]}</b><br><br>
@@ -52,6 +28,3 @@ async function cek() {
   document.getElementById("hasil").innerHTML = "Nama tidak ditemukan";
 }
 </script>
-
-</body>
-</html>
