@@ -1,31 +1,134 @@
+<!DOCTYPE html>
+
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Pengumuman Kelulusan SMK NEGERI 1 PENUKAL UTARA</title>
+
+<style>
+body {
+  font-family: Arial;
+  text-align: center;
+  background: #f4f6f9;
+}
+
+.container {
+  background: white;
+  padding: 20px;
+  margin: 50px auto;
+  width: 350px;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+input, button {
+  padding: 10px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+button {
+  background: #3498db;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #2980b9;
+}
+
+#hasil {
+  margin-top: 20px;
+}
+</style>
+
+</head>
+
+<body>
+
+<h2>PENGUMUMAN KELULUSAN</h2>
+<p>SMK NEGERI 1 PENUKAL UTARA</p>
+
+<div class="container">
+<input type="text" id="nama" placeholder="Masukkan Nama Lengkap">
+<button onclick="cek()">Cek Kelulusan</button>
+<div id="hasil"></div>
+</div>
+
 <script>
 const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQDmAoKhw0drIf16ZANBjoaKrn9wvMne1woW30r8ff7v4_uT1vtI0iCHNYeLK0jFKC4khbp_pR072I5/pub?output=csv";
 
-async function cek() {
-  const inputNama = document.getElementById("nama").value.toLowerCase().trim();
-  const res = await fetch(sheetURL);
-  const data = await res.text();
+// Fungsi parsing CSV aman (support koma & tanda kutip)
+function parseCSV(text) {
+  const rows = [];
+  let current = '';
+  let insideQuotes = false;
+  let row = [];
 
-  const rows = data.split("\n").slice(1);
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
 
-  for (let row of rows) {
-    // split aman untuk CSV
-    const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-
-    const nama = cols[1]?.replace(/"/g, "").toLowerCase().trim();
-
-    if (nama.includes(inputNama)) {
-      document.getElementById("hasil").innerHTML = `
-        <h3>${cols[1]}</h3>
-        Status: <b>${cols[2]}</b><br><br>
-        <a href="${cols[3]}" target="_blank">
-          <button>Download SKL</button>
-        </a>
-      `;
-      return;
+    if (char === '\"') {
+      insideQuotes = !insideQuotes;
+    } else if (char === ',' && !insideQuotes) {
+      row.push(current);
+      current = '';
+    } else if (char === '\\n' && !insideQuotes) {
+      row.push(current);
+      rows.push(row);
+      row = [];
+      current = '';
+    } else {
+      current += char;
     }
   }
 
-  document.getElementById("hasil").innerHTML = "Nama tidak ditemukan";
+  row.push(current);
+  rows.push(row);
+
+  return rows;
+}
+
+async function cek() {
+  const input = document.getElementById(\"nama\").value.toLowerCase().trim();
+  const hasil = document.getElementById(\"hasil\");
+
+  if (!input) {
+    hasil.innerHTML = \"Masukkan nama terlebih dahulu\";
+    return;
+  }
+
+  try {
+    const res = await fetch(sheetURL);
+    const text = await res.text();
+    const data = parseCSV(text);
+
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+
+      const nama = (row[1] || '').toLowerCase().trim();
+      const status = row[2] || '';
+      const skl = row[3] || '';
+
+      if (nama.includes(input)) {
+        hasil.innerHTML = `
+          <h3>${row[1]}</h3>
+          <p>Status: <b>${status}</b></p>
+          ${skl ? `<a href=\"${skl}\" target=\"_blank\">
+            <button>Download SKL</button>
+          </a>` : ''}
+        `;
+        return;
+      }
+    }
+
+    hasil.innerHTML = \"Nama tidak ditemukan\";
+  } catch (err) {
+    hasil.innerHTML = \"Gagal mengambil data. Periksa koneksi atau link Google Sheet.\";
+  }
 }
 </script>
+
+</body>
+</html>
