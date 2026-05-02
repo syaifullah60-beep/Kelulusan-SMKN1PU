@@ -9,9 +9,10 @@ async function cek() {
   const rows = data.split("\n").slice(1);
 
   for (let row of rows) {
+    // split aman untuk CSV
     const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 
-    const nama = cols[1]?.toLowerCase().trim();
+    const nama = cols[1]?.replace(/"/g, "").toLowerCase().trim();
 
     if (nama.includes(inputNama)) {
       document.getElementById("hasil").innerHTML = `
