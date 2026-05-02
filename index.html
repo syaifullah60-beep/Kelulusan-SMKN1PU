@@ -17,7 +17,7 @@ button {background:#3498db; color:white; border:none;}
 <p>SMK NEGERI 1 PENUKAL UTARA</p>
 
 <div class="container">
-<input type="text" id="nama" placeholder="Masukkan Nama">
+<input type="text" id="Nama" placeholder="Masukkan Nama">
 <button onclick="cek()">Cek Kelulusan</button>
 <div id="hasil"></div>
 </div>
@@ -26,7 +26,7 @@ button {background:#3498db; color:white; border:none;}
 const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQDmAoKhw0drIf16ZANBjoaKrn9wvMne1woW30r8ff7v4_uT1vtI0iCHNYeLK0jFKC4khbp_pR072I5/pub?output=csv";
 
 async function cek() {
-  const inputNama = document.getElementById("nama").value.toLowerCase().trim();
+  const inputNama = document.getElementById("Nama").value.toLowerCase().trim();
   const res = await fetch(sheetURL);
   const data = await res.text();
 
@@ -34,9 +34,9 @@ async function cek() {
 
   for (let row of rows) {
     const cols = row.split(",");
-    const nama = cols[1]?.toLowerCase().trim();
+    const Nama = cols[1]?.toLowerCase().trim();
 
-    if (nama === inputNama) {
+    if (Nama === inputNama) {
       document.getElementById("hasil").innerHTML = `
         Nama: ${cols[1]}<br>
         Status: ${cols[2]}<br><br>
